@@ -18,4 +18,3 @@ A vector with the same length of x, with the scores of x transformed into fuzzy 
 fsCalibrate calibrates fuzzy sets using the direct transformation method as described in Charles Ragin's
 Redesigning Social Inquiry
 }
-

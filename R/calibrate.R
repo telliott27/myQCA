@@ -33,3 +33,28 @@ fsCalibrate<-function(x,thresholds) {
 	scores<-exp(prod)/(1+exp(prod))
 	return(scores)
 }
+
+
+
+#' Print Pretty Truth Table
+#' 
+#' prints a pretty version of the truth table for use with knitr and rmarkdwon
+#' 
+#' @param truth a truthTable object
+#' @param complete print the complete truth table, including empty rows?
+#' 
+#' @return 
+#' 
+#' A markdown formatted version of the truth table
+#' 
+#' @export
+
+pretty.truth<-function(truth,complete=FALSE) {
+  tt<-truth$tt %>% select(-PRI,-cases) %>% 
+    mutate(incl=round(as.numeric(incl),digits=3)) %>%
+    arrange(desc(incl))
+  if( !complete ) {
+    tt<-tt %>% filter(n>0)
+  }
+  knitr::kable(tt)
+}
