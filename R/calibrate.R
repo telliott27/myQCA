@@ -49,7 +49,7 @@ fsCalibrate<-function(x,thresholds) {
 #' 
 #' @export
 
-pretty.truth<-function(truth,complete=FALSE) {
+pretty.tt<-function(truth,complete=FALSE) {
   tt<-truth$tt %>% select(-PRI,-cases) %>% 
     mutate(incl=round(as.numeric(incl),digits=3)) %>%
     arrange(desc(incl))
