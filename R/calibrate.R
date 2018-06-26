@@ -1,9 +1,3 @@
-#written by Thomas Elliott
-#University of California, Irvine
-#http://thomaselliott.me
-
-
-
 #' fuzzy set calibration
 #' 
 #' fsCalibrate calibrates fuzzy sets using the direct transformation method as described in Charles Ragin's
@@ -48,13 +42,44 @@ fsCalibrate<-function(x,thresholds) {
 #' A markdown formatted version of the truth table
 #' 
 #' @export
+#' @importFrom magrittr %>%
 
 pretty.tt<-function(truth,complete=FALSE) {
-  tt<-truth$tt %>% select(-PRI,-cases) %>% 
-    mutate(incl=round(as.numeric(incl),digits=3)) %>%
-    arrange(desc(incl))
+  tt<-truth$tt %>% dplyr::select(-PRI,-cases) %>% 
+    dplyr::mutate(incl=round(as.numeric(incl),digits=3)) %>%
+    dplyr::arrange(desc(incl))
   if( !complete ) {
-    tt<-tt %>% filter(n>0)
+    tt<-tt %>% dplyr::filter(n>0)
   }
   knitr::kable(tt)
+}
+
+#' Print Pretty QCA Solution
+#' 
+#' Prints a pretty version of the QCA solution that can be used with knitr and rmarkdown
+#' 
+#' @param sol a qca object
+#' @param number which intermediate solution
+#' 
+#' @ return
+#' 
+#' A markdown formatted version of the truth table
+#' 
+#' @export
+#' @importFrom magrittr %>%
+
+pretty.qca<-function(sol, number=1) {
+  # pull out the individual intermediate solution
+  i.sol<-sol$i.sol[[number]]$IC
+  # grab the data.frame of the individual recipe solutions
+  sol.df<-i.sol$incl.cov %>% tibble::rownames_to_column("Recipe") %>% dplyr::select(-cases)
+  overall.sol<-data.frame(Recipe="Overall", 
+                          inclS=i.sol$sol.incl.cov["incl"],
+                          PRI=i.sol$sol.incl.cov["PRI"],
+                          covS=i.sol$sol.incl.cov["cov"])
+  sol.df<-sol.df %>% dplyr::bind_rows(overall.sol) %>%
+    dplyr::mutate_at(dplyr::vars(inclS,PRI,covS,covU), dplyr::funs(round(.,digits=3))) %>%
+    dplyr::select(Recipe,Consistency=inclS,Coverage=covS,`Unique Coverage`=covU)
+  options(knitr.kable.NA='')
+  knitr::kable(sol.df)
 }
